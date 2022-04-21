@@ -44,10 +44,16 @@ def unpack_addresses(addresses: Tuple[str]) -> List[Tuple[str, str]]:
 @click.option(
     "-t", "--to-address", help="Specify recipient(s)", required=True, multiple=True
 )
+@click.option(
+    "-c", "--cc-address", help="Specify carbon copy recipient(s)", multiple=True
+)
+@click.option(
+    "--bcc-address", help="Specify blind carbon copy recipient(s)", multiple=True
+)
 @click.option("-s", "--subject", help="Specify subject", required=True)
 @click.option("-b", "--body", help="Specify message body", required=True)
 @click.option("-a", "--attach", help="Specify an attachment")
-def sendmail(from_address, to_address, subject, body, attach):
+def sendmail(from_address, to_address, cc_address, bcc_address, subject, body, attach):
 
     message = Mail(
         from_email=from_address,
@@ -55,6 +61,10 @@ def sendmail(from_address, to_address, subject, body, attach):
         subject=subject,
         html_content=body,
     )
+    if cc_address:
+        message.cc_emails = unpack_addresses(cc_address)
+    if bcc_address:
+        message.bcc_emails = unpack_addresses(bcc_address)
 
     if attach:
         attachment_path = Path(attach)
