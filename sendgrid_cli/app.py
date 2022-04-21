@@ -2,6 +2,7 @@ import base64
 import os
 from mimetypes import guess_type
 from pathlib import Path
+from typing import List, Tuple
 from uuid import uuid4
 
 import click
@@ -22,6 +23,17 @@ ATTACHMENT_DEFAULT_CONTENT_DISPOSITION = "attachment"
 load_dotenv()
 
 
+def unpack_addresses(addresses: Tuple[str]) -> List[Tuple[str, str]]:
+    to_emails = []
+    for addr in addresses:
+        parts = addr.split(" ")
+        if len(parts) > 1:
+            to_emails.append((parts[-1], " ".join(parts[:-1])))
+        else:
+            to_emails.append((addr, ""))
+    return to_emails
+
+
 @click.command()
 @click.option(
     "-f",
@@ -29,14 +41,17 @@ load_dotenv()
     help="Specify sender address",
     required=True,
 )
-@click.option("-t", "--to-address", help="Specify recipient(s)", required=True)
+@click.option(
+    "-t", "--to-address", help="Specify recipient(s)", required=True, multiple=True
+)
 @click.option("-s", "--subject", help="Specify subject", required=True)
 @click.option("-b", "--body", help="Specify message body", required=True)
 @click.option("-a", "--attach", help="Specify an attachment")
 def sendmail(from_address, to_address, subject, body, attach):
+
     message = Mail(
         from_email=from_address,
-        to_emails=to_address,
+        to_emails=unpack_addresses(to_address),
         subject=subject,
         html_content=body,
     )
