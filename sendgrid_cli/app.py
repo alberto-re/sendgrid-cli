@@ -110,8 +110,11 @@ def sendmail(
     if template_id:
         message.template_id = template_id
 
-    response = sg.send(message)
-    print(response.status_code)
+    try:
+        sg.send(message)
+        print("Email sent successfully")
+    except Exception as e:
+        print(f"Email not sent, exception follows '{e}'")
 
 
 if __name__ == "__main__":
