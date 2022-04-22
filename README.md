@@ -33,7 +33,6 @@ directory and insert into the newly created file your SendGrid API key.
 
 ### Show usage and options
 
-
 ```
 $ poetry run sendmail -h
 Usage: sendmail [OPTIONS]
@@ -50,3 +49,53 @@ Options:
   -d, --template-data TEXT  Specify template data
   -h, --help                Show this message and exit.
 ```
+
+### Send an email
+
+```
+poetry run sendmail \
+  -f me@example.com \
+  -t you@example.com \
+  -s "SendGrid is awesome" \
+  -b "SendGrid is <b>awesome</b>"
+Email sent successfully
+```
+
+### Send an email loading HTML body from a file
+
+```
+poetry run sendmail \
+  -f me@example.com \
+  -t you@example.com \
+  -s "SendGrid is awesome" \
+  -b file:/tmp/template.html
+Email sent successfully
+```
+
+### Send an email to multiple recipients
+
+Just specify multiple times the _-t, --to-address_ option:
+
+```
+poetry run sendmail \
+  -f me@example.com \
+  -t you@example.com \
+  -t him@example.com \
+  -s "SendGrid is awesome" \
+  -b file:/tmp/template.html
+Email sent successfully
+```
+
+### Specify CC/BCC additional recipients
+
+Use respectively _-c, --cc-address_ or _-bcc-address_. Both options work just like
+the _-t, --to-address_ option:
+
+```
+poetry run sendmail \
+  -f me@example.com \
+  -t you@example.com \
+  --bcc-address him@example.com \
+  -s "SendGrid is awesome" \
+  -b file:/tmp/template.html
+Email sent successfully
