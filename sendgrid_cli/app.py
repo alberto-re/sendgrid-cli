@@ -75,7 +75,7 @@ def attach_to_message(file: str, message: Mail) -> None:
     "--bcc-address", help="Specify blind carbon copy recipient(s)", multiple=True
 )
 @click.option("-s", "--subject", help="Specify subject", required=True)
-@click.option("-b", "--body", help="Specify message body")
+@click.option("-b", "--body", help="Specify message body (HTML)")
 @click.option("-a", "--attach", help="Specify an attachment", multiple=True)
 @click.option("-i", "--template-id", help="Specify a template ID")
 @click.option("-d", "--template-data", help="Specify template data")
@@ -90,6 +90,10 @@ def sendmail(
     template_data,
     template_id,
 ):
+
+    if body and body.startswith("file:"):
+        with open(body[5:], "r") as r:
+            body = r.read()
 
     message = Mail(
         from_email=from_address,
