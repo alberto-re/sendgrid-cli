@@ -115,3 +115,23 @@ poetry run sendmail \
   -a file1.txt \
   -a /an/other/path/file1.txt
 ```
+
+### Specify the message body using dynamic templates
+
+The template must've been previously created.
+
+Instead of using the _-b, --body_ option specify the template ID with the
+_-i, --template-id_ option, and the template data as a JSON string with
+_-d, --template-data_, respectively.
+
+The value passed through the _-s, --subject_ option is automatically assigned
+to the _subject_ template variable, if defined.
+
+```
+poetry run sendmail \
+  -f me@example.com \
+  -t you@example.com \
+  -s "SendGrid is awesome" \
+  -i d-222e0d223b5349929b86c4a3c9556dc1 \
+  -d '{"content": "CONTENT"}'
+```

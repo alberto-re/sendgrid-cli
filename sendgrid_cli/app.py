@@ -110,7 +110,9 @@ def sendmail(
         attach_to_message(file, message)
 
     if template_data:
-        message.dynamic_template_data = json.loads(template_data)
+        placeholders = json.loads(template_data)
+        placeholders["subject"] = subject
+        message.dynamic_template_data = placeholders
     if template_id:
         message.template_id = template_id
 
