@@ -1,4 +1,5 @@
 import base64
+import json
 import os
 from mimetypes import guess_type
 from pathlib import Path
@@ -19,7 +20,7 @@ from sendgrid.helpers.mail import (
 )
 
 ATTACHMENT_DEFAULT_CONTENT_DISPOSITION = "attachment"
-CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 
 load_dotenv()
 
@@ -72,9 +73,21 @@ def attach_to_message(file: str, message: Mail) -> None:
     "--bcc-address", help="Specify blind carbon copy recipient(s)", multiple=True
 )
 @click.option("-s", "--subject", help="Specify subject", required=True)
-@click.option("-b", "--body", help="Specify message body", required=True)
+@click.option("-b", "--body", help="Specify message body")
 @click.option("-a", "--attach", help="Specify an attachment", multiple=True)
-def sendmail(from_address, to_address, cc_address, bcc_address, subject, body, attach):
+@click.option("-i", "--template-id", help="Specify a template ID")
+@click.option("-d", "--template-data", help="Specify template data")
+def sendmail(
+    from_address,
+    to_address,
+    cc_address,
+    bcc_address,
+    subject,
+    body,
+    attach,
+    template_data,
+    template_id,
+):
 
     message = Mail(
         from_email=from_address,
@@ -89,6 +102,11 @@ def sendmail(from_address, to_address, cc_address, bcc_address, subject, body, a
 
     for file in attach:
         attach_to_message(file, message)
+
+    if template_data:
+        message.dynamic_template_data = json.loads(template_data)
+    if template_id:
+        message.template_id = template_id
 
     response = sg.send(message)
     print(response.status_code)
