@@ -22,6 +22,8 @@ ATTACHMENT_DEFAULT_CONTENT_DISPOSITION = "attachment"
 
 load_dotenv()
 
+sg = SendGridAPIClient(os.environ.get("SENDGRID_API_KEY"))
+
 
 def unpack_addresses(addresses: Tuple[str]) -> List[Tuple[str, str]]:
     to_emails = []
@@ -32,6 +34,24 @@ def unpack_addresses(addresses: Tuple[str]) -> List[Tuple[str, str]]:
         else:
             to_emails.append((addr, ""))
     return to_emails
+
+
+def attach_to_message(file: str, message: Mail) -> None:
+    path = Path(file)
+    if not path.is_file():
+        raise IOError()
+
+    with open(path, "rb") as f:
+        data = f.read()
+
+    encoded = base64.b64encode(data).decode()
+    attachment = Attachment()
+    attachment.file_content = FileContent(encoded)
+    attachment.file_type = FileType(guess_type(path)[0])
+    attachment.file_name = FileName(path.name)
+    attachment.disposition = Disposition(ATTACHMENT_DEFAULT_CONTENT_DISPOSITION)
+    attachment.content_id = ContentId(str(uuid4()))
+    message.attachment = attachment
 
 
 @click.command()
@@ -52,7 +72,7 @@ def unpack_addresses(addresses: Tuple[str]) -> List[Tuple[str, str]]:
 )
 @click.option("-s", "--subject", help="Specify subject", required=True)
 @click.option("-b", "--body", help="Specify message body", required=True)
-@click.option("-a", "--attach", help="Specify an attachment")
+@click.option("-a", "--attach", help="Specify an attachment", multiple=True)
 def sendmail(from_address, to_address, cc_address, bcc_address, subject, body, attach):
 
     message = Mail(
@@ -66,24 +86,9 @@ def sendmail(from_address, to_address, cc_address, bcc_address, subject, body, a
     if bcc_address:
         message.bcc_emails = unpack_addresses(bcc_address)
 
-    if attach:
-        attachment_path = Path(attach)
-        if not attachment_path.is_file():
-            raise IOError()
+    for file in attach:
+        attach_to_message(file, message)
 
-        with open(attachment_path, "rb") as f:
-            data = f.read()
-
-        encoded = base64.b64encode(data).decode()
-        attachment = Attachment()
-        attachment.file_content = FileContent(encoded)
-        attachment.file_type = FileType(guess_type(attachment_path)[0])
-        attachment.file_name = FileName(attachment_path.name)
-        attachment.disposition = Disposition(ATTACHMENT_DEFAULT_CONTENT_DISPOSITION)
-        attachment.content_id = ContentId(str(uuid4()))
-        message.attachment = attachment
-
-    sg = SendGridAPIClient(os.environ.get("SENDGRID_API_KEY"))
     response = sg.send(message)
     print(response.status_code)
 
