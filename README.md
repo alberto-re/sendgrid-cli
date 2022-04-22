@@ -9,11 +9,25 @@ A command line tool to send emails through SendGrid APIs.
 
 ## Installation
 
+### Install dependencies with Poetry
+
 Place yourself in the root of the project and execute in a terminal the command:
 
 ```
 poetry install
 ```
+
+### Export SENDGRID_API_KEY environment variable
+
+You can either export the variable directly on your terminal session before
+running the application, like this:
+
+```
+export SENDGRID_API_KEY=<YOUR_API_KEY_VALUE>
+```
+
+or copy the provided _.env.dist_ file as a new file named _.env_ in the same
+directory and insert into the newly created file your SendGrid API key.
 
 ## Usage
 
