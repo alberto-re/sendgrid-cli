@@ -19,6 +19,7 @@ from sendgrid.helpers.mail import (
 )
 
 ATTACHMENT_DEFAULT_CONTENT_DISPOSITION = "attachment"
+CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 load_dotenv()
 
@@ -54,7 +55,7 @@ def attach_to_message(file: str, message: Mail) -> None:
     message.attachment = attachment
 
 
-@click.command()
+@click.command(context_settings=CONTEXT_SETTINGS)
 @click.option(
     "-f",
     "--from-address",
