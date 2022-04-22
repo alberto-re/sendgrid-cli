@@ -102,9 +102,9 @@ def sendmail(
         html_content=body,
     )
     if cc_address:
-        message.cc_emails = unpack_addresses(cc_address)
+        message.cc = unpack_addresses(cc_address)
     if bcc_address:
-        message.bcc_emails = unpack_addresses(bcc_address)
+        message.bcc = unpack_addresses(bcc_address)
 
     for file in attach:
         attach_to_message(file, message)
