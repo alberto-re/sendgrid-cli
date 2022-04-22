@@ -99,3 +99,19 @@ poetry run sendmail \
   -s "SendGrid is awesome" \
   -b file:/tmp/template.html
 Email sent successfully
+```
+
+### Add attachments to the message
+
+You can attach one or more file by specifying _-a, --attach_ for each
+file to attach to the message to be sent:
+
+```
+poetry run sendmail \
+  -f me@example.com \
+  -t you@example.com \
+  -s "SendGrid is awesome" \
+  -b file:/tmp/template.html \
+  -a file1.txt \
+  -a /an/other/path/file1.txt
+```
